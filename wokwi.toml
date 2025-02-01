@@ -1,0 +1,5 @@
+[wokwi]
+version = 1
+firmware = 'build/Projeto-Final-de-Computacao-Fisica.ino.hex'
+elf = 'build/Projeto-Final-de-Computacao-Fisica.ino.elf'
+rfc2217ServerPort = 4444
