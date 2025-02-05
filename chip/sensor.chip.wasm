@@ -1,0 +1,34 @@
+(module
+  ;; Import memory and functions
+  (import "env" "memory" (memory 1))
+  (import "env" "analogRead" (func $analogRead (param i32) (result i32)))
+  
+  ;; Constants based on JSON specifications
+  (global $PIN_A0 i32 (i32.const 2))  ;; Third pin (A0) as specified in JSON
+  (global $MIN_VALUE i32 (i32.const 0))
+  (global $MAX_VALUE i32 (i32.const 1024))
+  
+  ;; Export main function
+  (export "tick" (func $tick))
+  
+  ;; Main tick function that reads sensor value
+  (func $tick (result i32)
+    (local $value i32)
+    
+    ;; Read raw value from A0
+    (set_local $value
+      (call $analogRead
+        (global.get $PIN_A0)
+      )
+    )
+    
+    ;; Ensure value is within specified range
+    (i32.min
+      (i32.max
+        (get_local $value)
+        (global.get $MIN_VALUE)
+      )
+      (global.get $MAX_VALUE)
+    )
+  )
+)

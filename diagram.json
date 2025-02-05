@@ -3,9 +3,99 @@
   "author": "G. Melo",
   "editor": "wokwi",
   "parts": [
-    { "type": "wokwi-arduino-uno", "id": "uno", "top": 0, "left": 0, "attrs": {} },
-    { "type": "wokwi-lcd1602", "id": "lcd1", "top": -236.57, "left": -12.8, "attrs": {} }
+    {
+      "type": "wokwi-arduino-uno",
+      "id": "uno",
+      "top": 183,
+      "left": 18.6,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-buzzer",
+      "id": "buzzer",
+      "top": 136.8,
+      "left": 453,
+      "attrs": { "volume": "0.1" }
+    },
+    {
+      "type": "wokwi-potentiometer",
+      "id": "pot1",
+      "top": 142.7,
+      "left": 547,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-rotary-encoder",
+      "id": "encoder1",
+      "top": 16,
+      "left": 68.6,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-rgb-led",
+      "id": "led1",
+      "top": 42.4,
+      "left": 481.1,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-rgb-led",
+      "id": "led2",
+      "top": 42.4,
+      "left": 529.1,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-rgb-led",
+      "id": "led3",
+      "top": 42.4,
+      "left": 577.1,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-lcd1602",
+      "id": "lcd1",
+      "top": 246.4,
+      "left": 380,
+      "attrs": { "pins": "i2c" }
+    },
+    {
+      "type": "chip-moisture-sensor",
+      "id": "chip1",
+      "top": 404.22,
+      "left": 475.2,
+      "attrs": {}
+    }
   ],
-  "connections": [],
+  "connections": [
+    ["pot1:VCC", "buzzer:2", "red", ["v0"]],
+    ["buzzer:2", "lcd1:VCC", "red", ["h-115.6", "v67.1"]],
+    ["chip1:VCC", "lcd1:VCC", "red", ["h-19.2", "v-28.8", "h-86.4", "v-105.6"]],
+    [
+      "chip1:GND",
+      "lcd1:GND",
+      "black",
+      ["h-9.6", "v-28.8", "h-105.6", "v-105.6"]
+    ],
+    ["buzzer:1", "lcd1:GND", "black", ["v-9.6", "h-115.2", "v67.2"]],
+    ["buzzer:1", "pot1:GND", "black", ["v0"]],
+    ["chip1:A0", "uno:A0", "#8f4814", ["h-28.8", "v-28.8", "h-230.4"]],
+    ["pot1:SIG", "uno:A1", "orange", ["v19.2", "h-230.8", "v163.2", "h-124.8"]],
+    ["led2:COM", "led3:COM", "black", ["v0"]],
+    ["led2:COM", "led1:COM", "black", ["v0"]],
+    ["lcd1:GND", "uno:GND.3", "black", ["h-19.2", "v134.4", "h-163.2"]],
+    ["led1:R", "led2:R", "red", ["v19.2", "h48"]],
+    ["led2:R", "led3:R", "red", ["v19.2", "h48"]],
+    ["led1:G", "led2:G", "green", ["v28.8", "h49.3"]],
+    ["led2:G", "led3:G", "green", ["v28.8", "h49.3"]],
+    ["led1:B", "led2:B", "blue", ["v38.4", "h49.6"]],
+    ["led2:B", "led3:B", "blue", ["v38.4", "h49.6"]],
+    ["uno:6", "led1:R", "red", ["v-86.4", "h272.5"]],
+    ["uno:5", "led1:G", "green", ["v-76.8", "h282.2"]],
+    ["uno:3", "led1:B", "blue", ["v-67.2", "h272.8"]],
+    ["uno:4", "led1:COM", "black", ["v-96", "h13.5"]],
+    ["uno:A5", "lcd1:SCL", "cyan", ["v-0.1", "h61.9", "v-67.2"]],
+    ["uno:A4", "lcd1:SDA", "limegreen", ["v9.5", "h81", "v-86.4"]]
+  ],
   "dependencies": {}
 }
