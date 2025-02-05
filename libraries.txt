@@ -1,0 +1,19 @@
+# Wokwi Library List
+# See https://docs.wokwi.com/guides/libraries
+
+# ANCHOR - Lista de bibliotecas necessárias para o projeto
+# TODO - Verificar se todas as bibliotecas estão atualizadas
+
+# SoftwareWire - Biblioteca para comunicação I2C por software
+# Útil quando as portas I2C hardware estão ocupadas
+SoftwareWire
+
+# EEPROMEx - Biblioteca estendida para manipulação da EEPROM
+# Permite leitura/gravação otimizada na memória não-volátil
+EEPROMEx
+
+# LiquidCrystal_I2C_UTF8 - Biblioteca para controle de display LCD via I2C
+# Suporta caracteres UTF-8 para exibição de caracteres especiais
+# Que eu ainda não sei como usar, não sei se não funciona no wokwi
+# ou se foi pedir demais querer que emojis fossem exibidos no display ;-;
+LiquidCrystal_I2C_UTF8

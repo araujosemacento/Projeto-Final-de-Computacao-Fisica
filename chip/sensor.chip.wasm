@@ -1,28 +1,69 @@
+;; ESSE ARQUIVO FOI UM SACO DE ENTENDER COMO ARRANJAR
+;; A VERSÃO WEB ASSEMBLY DO MEU CÓDIGO EM C, QUE É
+;; SUPER SIMPLES INCLUSIVE E PIOR AINDA DE FAZER FUNCIONAR
+;; TRALHA ESSA QUE EU MAL USEI!!!!
+;; MALDITO SEJA ASSEMBLY, MORRE PRAGA!
+;; ANCHOR: nunca_mais_assembly
 (module
-  ;; Import memory and functions
-  (import "env" "memory" (memory 1))
-  (import "env" "analogRead" (func $analogRead (param i32) (result i32)))
-  
-  ;; Constants based on JSON specifications
-  (global $PIN_A0 i32 (i32.const 2))  ;; Third pin (A0) as specified in JSON
-  (global $MIN_VALUE i32 (i32.const 0))
-  (global $MAX_VALUE i32 (i32.const 1024))
-  
-  ;; Export main function
-  (export "tick" (func $tick))
-  
-  ;; Main tick function that reads sensor value
-  (func $tick (result i32)
-    (local $value i32)
-    
-    ;; Read raw value from A0
-    (set_local $value
-      (call $analogRead
-        (global.get $PIN_A0)
+  ;; ANCHOR: imports
+  ;; Importações do ambiente de execução
+  (import "env" "memory" (memory 1))    ;; Memória compartilhada com o host
+  (import "env" "pin_init" (func $pin_init (param i32 i32) (result i32)))  ;; Função para inicializar pinos
+  (import "env" "analog_read_pin" (func $analog_read_pin (param i32) (result i32)))  ;; Função para leitura analógica
+  (import "env" "printf" (func $printf (param i32) (result i32)))  ;; Função para debug/logging
+  ;; ANCHOR_END: imports
+
+  ;; ANCHOR: constants
+  ;; Definição das constantes do módulo
+  (global $PIN_NAME i32 (i32.const 0))  ;; Endereço da string do nome do pino (A0)
+  (global $ANALOG i32 (i32.const 1))    ;; Constante para modo analógico
+  (global $MIN_VALUE i32 (i32.const 0)) ;; Valor mínimo aceito da leitura
+  (global $MAX_VALUE i32 (i32.const 1024)) ;; Valor máximo aceito da leitura (10 bits)
+  ;; ANCHOR_END: constants
+
+  ;; ANCHOR: static_data
+  ;; Dados estáticos alocados na memória
+  (data (i32.const 0) "A0\00")         ;; Nome do pino em formato string
+  (data (i32.const 16) "Sensor chip initialized!\n\00") ;; Mensagem de inicialização
+  ;; ANCHOR_END: static_data
+
+  ;; ANCHOR: globals
+  ;; Variáveis globais do módulo
+  (global $sensor_pin (mut i32) (i32.const 0)) ;; Armazena referência do pino inicializado
+  ;; ANCHOR_END: globals
+
+  ;; ANCHOR: initialization
+  ;; Função de inicialização do chip
+  ;; Responsável por configurar o pino e exibir mensagem de status
+  (func $chip_init (export "chip_init")
+    ;; Inicializa o pino no modo analógico
+    (global.set $sensor_pin
+      (call $pin_init
+        (global.get $PIN_NAME)
+        (global.get $ANALOG)
       )
     )
+    ;; TODO: Adicionar verificação de erro na inicialização
+    ;; Exibe mensagem de sucesso
+    (call $printf (i32.const 16))
+  )
+  ;; ANCHOR_END: initialization
+
+  ;; ANCHOR: main_loop
+  ;; Função principal executada em loop
+  ;; Retorna: valor analógico normalizado entre MIN_VALUE e MAX_VALUE
+  (func $tick (export "tick") (result i32)
+    (local $value i32)
     
-    ;; Ensure value is within specified range
+    ;; Realiza leitura do valor analógico
+    (set_local $value
+      (call $analog_read_pin
+        (global.get $sensor_pin)
+      )
+    )
+
+    ;; REVIEW: Avaliar necessidade de filtro para redução de ruído
+    ;; Garante que o valor esteja dentro dos limites estabelecidos
     (i32.min
       (i32.max
         (get_local $value)
@@ -31,4 +72,5 @@
       (global.get $MAX_VALUE)
     )
   )
+  ;; ANCHOR_END: main_loop
 )

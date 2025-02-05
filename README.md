@@ -1,28 +1,50 @@
-<!-- markdownlint-disable MD033 -->
-# Projeto final da cadeira de computação física
+# Projeto Final de Computação Física
 
-## Análise sentimental de plantas através de um sensor de umidade
+## Monitor de Umidade do Solo com Interface Emocional
 
-O MVP (Minimum Viable Product) do projeto é o seguinte:
+Este projeto implementa um sistema interativo para monitoramento de umidade do solo usando Arduino, fornecendo feedback através de uma interface emocional divertida.
 
-- Sensor de umidade
-- Tela LCD de 16x2
+### Componentes
+
 - Arduino Uno
+- Sensor de umidade do solo capacitivo
+- Display LCD I2C 16x2
+- LED RGB
 - Buzzer
 - Potenciômetro
 
-<span style="text-align: justify; -webkit-hyphens: auto; -moz-hyphens: auto; -ms-hyphens: auto; hyphens: auto;">
-O pro&shy;je&shy;to tem co&shy;mo ob&shy;je&shy;ti&shy;vo a&shy;na&shy;li&shy;sar a u&shy;mi&shy;da&shy;de do am&shy;bi&shy;en&shy;te em que o sen&shy;sor es&shy;tá in&shy;se&shy;ri&shy;do, a&shy;fim de lem&shy;brar o u&shy;su&shy;á&shy;rio de re&shy;gar a es&shy;pé&shy;ci&shy;me de plan&shy;ta que es&shy;tá sen&shy;do mo&shy;ni&shy;to&shy;ra&shy;da con&shy;for&shy;me as con&shy;fi&shy;gu&shy;ra&shy;çõ&shy;es se&shy;ta&shy;das an&shy;te&shy;ri&shy;or&shy;men&shy;te pe&shy;lo pró&shy;pri&shy;o u&shy;su&shy;á&shy;rio (vo&shy;lu&shy;me de á&shy;gua ne&shy;ces&shy;sá&shy;rio pa&shy;ra a plan&shy;ta mo&shy;ni&shy;to&shy;ra&shy;da e in&shy;ter&shy;va&shy;lo de  tem&shy;po en&shy;tre as re&shy;gas).
-</span>
+### Funcionalidades
 
-### Como funciona?
+- **Calibração Interativa**: Permite definir o nível ideal de umidade para sua planta
+- **Monitoramento Contínuo**: Verifica a umidade do solo a cada hora
+- **Feedback Emocional**:
+  - LED Verde + Mensagem Feliz: Umidade ideal
+  - LED Azul + Alerta: Muito úmido
+  - LED Vermelho + Alerta: Muito seco
+- **Alarmes Sonoros**: Diferentes tons indicam diferentes estados
 
-<span style="text-align: justify; -webkit-hyphens: auto; -moz-hyphens: auto; -ms-hyphens: auto; hyphens: auto;">
-O sen&shy;sor ca&shy;pa&shy;ci&shy;ti&shy;vo de&shy;tec&shy;ta a u&shy;mi&shy;da&shy;de do am&shy;bi&shy;en&shy;te e en&shy;vi&shy;a os da&shy;dos ao Ar&shy;du&shy;i&shy;no Uno. O Ar&shy;du&shy;i&shy;no pro&shy;ces&shy;sa es&shy;sas in&shy;for&shy;ma&shy;çõ&shy;es e as e&shy;xi&shy;be no LCD pa&shy;ra o u&shy;su&shy;á&shy;rio. Quan&shy;do a u&shy;mi&shy;da&shy;de es&shy;tá a&shy;ba&shy;i&shy;xo do li&shy;mi&shy;te con&shy;fi&shy;gu&shy;ra&shy;do ou o in&shy;ter&shy;va&shy;lo en&shy;tre re&shy;gas é ex&shy;ce&shy;di&shy;do, o buz&shy;zer e&shy;mi&shy;te um a&shy;ler&shy;ta so&shy;no&shy;ro. O po&shy;ten&shy;ci&shy;ô&shy;me&shy;tro per&shy;mi&shy;te ao u&shy;su&shy;á&shy;rio a&shy;jus&shy;tar o va&shy;lor mí&shy;ni&shy;mo de u&shy;mi&shy;da&shy;de que a&shy;ti&shy;va&shy;rá o a&shy;ler&shy;ta.
-</span>
+### Instalação
 
-### Onde está o código?
+1. Clone este repositório
+2. Instale as bibliotecas necessárias listadas em [`libraries.txt`](libraries.txt)
+3. Carregue o código [`Projeto-Final-de-Computacao-Fisica.ino`](Projeto-Final-de-Computacao-Fisica.ino) no Arduino
 
-<span style="text-align: justify; -webkit-hyphens: auto; -moz-hyphens: auto; -ms-hyphens: auto; hyphens: auto;">
-O có&shy;di&shy;go es&shy;tá ar&shy;ma&shy;ze&shy;na&shy;do no re&shy;po&shy;si&shy;tó&shy;rio de&shy;di&shy;ca&shy;do ao pro&shy;je&shy;to no <a href="https://github.com/araujosemacento/Projeto-Final-de-Computacao-Fisica">Git&shy;Hub</a>. Seu mo&shy;de&shy;lo foi pro&shy;je&shy;ta&shy;do a&shy;tra&shy;vés da pla&shy;ta&shy;for&shy;ma de si&shy;mu&shy;la&shy;ção <a href="https://www.wokwi.com">Wok&shy;wi</a> a&shy;on&shy;de foi pos&shy;sí&shy;vel tes&shy;tar o fun&shy;ci&shy;o&shy;na&shy;men&shy;to do pro&shy;je&shy;to e es&shy;tá dis&shy;po&shy;ní&shy;vel pa&shy;ra vi&shy;su&shy;a&shy;li&shy;za&shy;ção a&shy;tra&shy;vés des&shy;te <a href="https://wokwi.com/projects/421645799385602049">link</a>.
-</span>
+### Simulação
+
+O projeto pode ser simulado usando o [Wokwi](https://wokwi.com) no diretório do [Projeto Final](https://wokwi.com/projects/421645799385602049). O arquivo [`diagram.json`](diagram.json) contém a configuração completa do circuito.
+
+### Estrutura do Projeto
+
+```plaintext
+├── chip/                                      # Implementação do sensor
+│   ├── sensor.chip.c                          # Lógica do sensor
+│   └── sensor.chip.json                       # Configuração do sensor
+├── Projeto-Final-de-Computacao-Fisica.ino     # Código principal
+├── diagram.json                               # Diagrama do circuito
+├── libraries.txt                              # Lista de dependências
+└── wokwi.toml                                 # Configuração do simulador
+```
+
+### Licença
+
+Este projeto está licenciado sob a [GNU General Public License v3.0](LICENSE).

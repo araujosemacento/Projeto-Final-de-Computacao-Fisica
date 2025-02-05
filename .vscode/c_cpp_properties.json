@@ -5,6 +5,9 @@
       "includePath": [
         "C:\\Users\\melo\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\avr\\1.8.6\\cores\\arduino/**",
         "C:\\Users\\melo\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\avr\\1.8.6\\variants\\standard/**",
+        "C:\\Users\\melo\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\avr\\1.8.6\\libraries\\Wire\\src/**",
+        "C:\\Users\\melo\\Documents\\Arduino\\libraries\\LiquidCrystal_I2C/**",
+        "C:\\Users\\melo\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\avr\\1.8.6\\libraries\\EEPROM\\src/**",
         "C:\\Users\\melo\\Documents\\Arduino\\libraries/**",
         "C:\\Users\\melo\\Documents\\Github\\Projeto-Final-de-Computacao-Fisica/**"
       ],
@@ -34,6 +37,9 @@
         "-DARDUINO_ARCH_AVR",
         "-IC:\\Users\\melo\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\avr\\1.8.6\\cores\\arduino",
         "-IC:\\Users\\melo\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\avr\\1.8.6\\variants\\standard",
+        "-IC:\\Users\\melo\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\avr\\1.8.6\\libraries\\Wire\\src",
+        "-IC:\\Users\\melo\\Documents\\Arduino\\libraries\\LiquidCrystal_I2C",
+        "-IC:\\Users\\melo\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\avr\\1.8.6\\libraries\\EEPROM\\src",
         "C:\\Users\\melo\\Documents\\Github\\Projeto-Final-de-Computacao-Fisica\\build\\sketch\\Projeto-Final-de-Computacao-Fisica.ino.cpp",
         "-o",
         "C:\\Users\\melo\\Documents\\Github\\Projeto-Final-de-Computacao-Fisica\\build\\sketch\\Projeto-Final-de-Computacao-Fisica.ino.cpp.o"

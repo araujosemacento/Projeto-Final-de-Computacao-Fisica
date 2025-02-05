@@ -1,9 +1,20 @@
+# ANCHOR: Configurações principais do Wokwi
 [wokwi]
 version = 1
+# Caminho para o arquivo compilado .hex do Arduino
 firmware = 'build/Projeto-Final-de-Computacao-Fisica.ino.hex'
+# Caminho para o arquivo ELF (Executable and Linkable Format,
+# levei muito tempo tentando entender onde eu conseguia ele e o hex 🤡)
 elf = 'build/Projeto-Final-de-Computacao-Fisica.ino.elf'
+# Porta serial virtual para comunicação
 rfc2217ServerPort = 4444
 
+# ANCHOR: Configuração do sensor de umidade
 [[chip]]
+# Nome identificador do sensor
 name = 'moisture-sensor'
+# Arquivo binário WASM contendo a implementação do sensor
 binary = 'chip/sensor.chip.wasm'
+
+# TODO: Adicionar configurações específicas do sensor como ranges de umidade
+# REVIEW: Verificar se a porta 4444 não está em uso por outro serviço
