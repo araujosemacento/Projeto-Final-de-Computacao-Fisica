@@ -1,76 +1,74 @@
-;; ESSE ARQUIVO FOI UM SACO DE ENTENDER COMO ARRANJAR
-;; A VERSÃO WEB ASSEMBLY DO MEU CÓDIGO EM C, QUE É
-;; SUPER SIMPLES INCLUSIVE E PIOR AINDA DE FAZER FUNCIONAR
-;; TRALHA ESSA QUE EU MAL USEI!!!!
-;; MALDITO SEJA ASSEMBLY, MORRE PRAGA!
-;; ANCHOR: nunca_mais_assembly
 (module
-  ;; ANCHOR: imports
-  ;; Importações do ambiente de execução
-  (import "env" "memory" (memory 1))    ;; Memória compartilhada com o host
-  (import "env" "pin_init" (func $pin_init (param i32 i32) (result i32)))  ;; Função para inicializar pinos
-  (import "env" "analog_read_pin" (func $analog_read_pin (param i32) (result i32)))  ;; Função para leitura analógica
-  (import "env" "printf" (func $printf (param i32) (result i32)))  ;; Função para debug/logging
-  ;; ANCHOR_END: imports
+  ;; Importações da API Wokwi
+  (import "env" "malloc" (func $malloc (param i32) (result i32)))
+  (import "wokwi" "pin_init" (func $pin_init (param i32 i32) (result i32)))
+  (import "wokwi" "pin_dac_write" (func $pin_dac_write (param i32 f32)))
+  (import "wokwi" "attr_init_float" (func $attr_init_float (param i32 f32) (result i32)))
+  (import "wokwi" "attr_read_float" (func $attr_read_float (param i32) (result f32)))
+  (import "wokwi" "timer_init" (func $timer_init (param i32) (result i32)))
+  (import "wokwi" "timer_start" (func $timer_start (param i32 i32 i32)))
 
-  ;; ANCHOR: constants
-  ;; Definição das constantes do módulo
-  (global $PIN_NAME i32 (i32.const 0))  ;; Endereço da string do nome do pino (A0)
-  (global $ANALOG i32 (i32.const 1))    ;; Constante para modo analógico
-  (global $MIN_VALUE i32 (i32.const 0)) ;; Valor mínimo aceito da leitura
-  (global $MAX_VALUE i32 (i32.const 1024)) ;; Valor máximo aceito da leitura (10 bits)
-  ;; ANCHOR_END: constants
+  ;; Memória e dados
+  (memory (export "memory") 1)
+  (data (i32.const 0) "OUT\00")
+  (data (i32.const 16) "moisture\00")
 
-  ;; ANCHOR: static_data
-  ;; Dados estáticos alocados na memória
-  (data (i32.const 0) "A0\00")         ;; Nome do pino em formato string
-  (data (i32.const 16) "Sensor chip initialized!\n\00") ;; Mensagem de inicialização
-  ;; ANCHOR_END: static_data
+  ;; Estado global do chip
+  (global $chip_state (mut i32) (i32.const 0))
 
-  ;; ANCHOR: globals
-  ;; Variáveis globais do módulo
-  (global $sensor_pin (mut i32) (i32.const 0)) ;; Armazena referência do pino inicializado
-  ;; ANCHOR_END: globals
-
-  ;; ANCHOR: initialization
   ;; Função de inicialização do chip
-  ;; Responsável por configurar o pino e exibir mensagem de status
   (func $chip_init (export "chip_init")
-    ;; Inicializa o pino no modo analógico
-    (global.set $sensor_pin
-      (call $pin_init
-        (global.get $PIN_NAME)
-        (global.get $ANALOG)
-      )
-    )
-    ;; TODO: Adicionar verificação de erro na inicialização
-    ;; Exibe mensagem de sucesso
-    (call $printf (i32.const 16))
-  )
-  ;; ANCHOR_END: initialization
+    ;; Aloca estrutura de estado
+    (i32.const 8)  ;; tamanho da estrutura (2 i32s)
+    (call $malloc)
+    (global.set $chip_state)
 
-  ;; ANCHOR: main_loop
-  ;; Função principal executada em loop
-  ;; Retorna: valor analógico normalizado entre MIN_VALUE e MAX_VALUE
-  (func $tick (export "tick") (result i32)
-    (local $value i32)
+    ;; Inicializa pino OUT como analógico
+    (i32.const 0)  ;; string "OUT"
+    (i32.const 1)  ;; ANALOG
+    (call $pin_init)
+    (global.get $chip_state)
+    (i32.store)    ;; armazena pin_out no estado
+
+    ;; Inicializa atributo de umidade
+    (i32.const 16) ;; string "moisture"
+    (f32.const 1.0)
+    (call $attr_init_float)
+    (global.get $chip_state)
+    (i32.const 4)
+    (i32.add)      ;; offset para moisture_attr
+    (i32.store)    ;; armazena moisture_attr no estado
+
+    ;; Configura timer
+    (call $setup_timer)
+  )
+
+  ;; Função de evento do timer
+  (func $chip_timer_event (export "chip_timer_event") (param i32)
+    (local $moisture f32)
     
-    ;; Realiza leitura do valor analógico
-    (set_local $value
-      (call $analog_read_pin
-        (global.get $sensor_pin)
-      )
-    )
-
-    ;; REVIEW: Avaliar necessidade de filtro para redução de ruído
-    ;; Garante que o valor esteja dentro dos limites estabelecidos
-    (i32.min
-      (i32.max
-        (get_local $value)
-        (global.get $MIN_VALUE)
-      )
-      (global.get $MAX_VALUE)
-    )
+    ;; Lê valor do atributo
+    (global.get $chip_state)
+    (i32.const 4)
+    (i32.add)
+    (i32.load)     ;; carrega moisture_attr
+    (call $attr_read_float)
+    (local.set $moisture)
+    
+    ;; Escreve no pino DAC
+    (global.get $chip_state)
+    (i32.load)     ;; carrega pin_out
+    (local.get $moisture)
+    (call $pin_dac_write)
   )
-  ;; ANCHOR_END: main_loop
+
+  ;; Função auxiliar para configurar timer
+  (func $setup_timer
+    (i32.const 32) ;; endereço do callback
+    (call $timer_init)
+    (local.tee 0)
+    (i32.const 1000) ;; intervalo
+    (i32.const 1)    ;; repetir
+    (call $timer_start)
+  )
 )

@@ -1,4 +1,7 @@
 {
-  "cSpell.words": ["Wokwi"],
-  "C_Cpp.errorSquiggles": "disabled"
+  "cSpell.words": ["arduino", "limegreen", "wokwi", "Wokwi"],
+  "C_Cpp.errorSquiggles": "disabled",
+  "files.associations": {
+    "stdio.h": "c"
+  }
 }

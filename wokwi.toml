@@ -14,7 +14,7 @@ rfc2217ServerPort = 4444
 # Nome identificador do sensor
 name = 'moisture-sensor'
 # Arquivo binário WASM contendo a implementação do sensor
-binary = 'chip/sensor.chip.wasm'
+binary = './chip/sensor.chip.wasm'
 
 # TODO: Adicionar configurações específicas do sensor como ranges de umidade
 # REVIEW: Verificar se a porta 4444 não está em uso por outro serviço

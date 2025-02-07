@@ -20,6 +20,8 @@ const int LED_B = 3;       // LED RGB - Pino Azul
 
 // ANCHOR - Constantes de Tempo
 const unsigned long HORA = 3600000;            // 1 hora em milissegundos
+const unsigned long QUINZE_MIN = 900000;       // 15 minutos em milissegundos
+const int INTERVALO_LEITURA = 1000;            // 1 segundo entre leituras (debug)
 const unsigned long ALARME_INTERVALO = 15000;  // 15 segundos entre alarmes
 const unsigned long CALIBRACAO_TIMEOUT = 3000; // 3 segundos para timeout
 const int SETORES = 3;                         // Divisão em 3 níveis de umidade
@@ -32,23 +34,23 @@ int ultimoValorPot = 0;          // Último valor lido do potenciômetro
 unsigned long inicioTimer = 0;   // Timer para calibração
 
 // ANCHOR - Arrays de Mensagens
-const char *MSG_FELIZ[] = {
-    "Tudo bem por aqui!",
-    "Vivendo a vida!",
-    "Estou crescendo!",
-    ";-) Que dia lindo!"};
+const char *MSG_FELIZ[][2] = {
+    {"Tudo bem", "por aqui!"},
+    {"Vivendo a", "vida!"},
+    {"Estou cres-", "cendo!"},
+    {";-) Que dia", "lindo!"}};
 
-const char *MSG_MOLHADA[] = {
-    "Estou afogando!",
-    "Socorro, diluvio!",
-    "Muita agua aqui!",
-    "Vou virar sopa! >_<"};
+const char *MSG_MOLHADA[][2] = {
+    {"Estou afo-", "gando!"},
+    {"Socorro, di-", "luvio!"},
+    {"Muita agua", "aqui!"},
+    {"Vou virar", "sopa! >_<"}};
 
-const char *MSG_SECA[] = {
-    "Preciso de agua!",
-    "Sede... muita sede",
-    "Cadê a chuva? :(",
-    "SOS! Deserto aqui!"};
+const char *MSG_SECA[][2] = {
+    {"Preciso", "de agua!"},
+    {"Sede...", "muita sede"},
+    {"Cade a", "chuva? :("},
+    {"SOS!", "Deserto aqui!"}};
 
 // ANCHOR - Inicialização
 void setup()
@@ -57,6 +59,8 @@ void setup()
   Wire.begin();
   lcd.init();
   lcd.backlight();
+
+  Serial.begin(9600);
 
   pinMode(BUZZER_PIN, OUTPUT);
   pinMode(LED_R, OUTPUT);
@@ -141,20 +145,26 @@ void verificarUmidade()
   // WARNING: Valores do sensor são invertidos (0 = molhado, 1023 = seco)
   int umidadeAtual = analogRead(SENSOR_PIN);
   int setorAtual = map(umidadeAtual, 0, 1023, 0, SETORES);
+  int msgIndex = random(4);
+
+  Serial.print("Umidade: ");
+  Serial.println(umidadeAtual);
 
   lcd.clear();
 
   if (setorAtual == umidadeIdeal)
   {
-    // Feliz
-    lcd.print(MSG_FELIZ[random(4)]);
+    lcd.print(MSG_FELIZ[msgIndex][0]);
+    lcd.setCursor(0, 1);
+    lcd.print(MSG_FELIZ[msgIndex][1]);
     setLED(0, 255, 0); // Verde
     tone(BUZZER_PIN, 2000, 100);
   }
   else if (setorAtual > umidadeIdeal)
   {
-    // Molhada
-    lcd.print(MSG_MOLHADA[random(4)]);
+    lcd.print(MSG_MOLHADA[msgIndex][0]);
+    lcd.setCursor(0, 1);
+    lcd.print(MSG_MOLHADA[msgIndex][1]);
     setLED(0, 0, 255); // Azul
     if (millis() - ultimoAlarme >= ALARME_INTERVALO)
     {
@@ -164,8 +174,9 @@ void verificarUmidade()
   }
   else
   {
-    // Seca
-    lcd.print(MSG_SECA[random(4)]);
+    lcd.print(MSG_SECA[msgIndex][0]);
+    lcd.setCursor(0, 1);
+    lcd.print(MSG_SECA[msgIndex][1]);
     setLED(255, 0, 0); // Vermelho
     if (millis() - ultimoAlarme >= ALARME_INTERVALO)
     {
@@ -189,7 +200,7 @@ void loop()
 {
   // REVIEW: Considerar adicionar botão de recalibração
   // TODO: Implementar modo de economia de energia
-  if (millis() - ultimaLeitura >= HORA)
+  if (millis() - ultimaLeitura >= QUINZE_MIN)
   {
     verificarUmidade();
     ultimaLeitura = millis();

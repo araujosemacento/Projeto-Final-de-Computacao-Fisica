@@ -1,62 +1,60 @@
-/* ANCHOR - Definição do Chip Sensor
- * Este módulo implementa um chip sensor analógico que:
- * - Realiza leitura de tensão de um pino analógico
- * - Ou melhor, simula a entrega de tensão pra um pino analógico
- * - Retornando valores normalizados entre 0 e 1024
- * - Utiliza uma única  entrada (saída, pino, sei lá, ficou complicado.
- * Depois de um tempo eu só fui pegando a manha mesmo) analógica configurável.
+/* ANCHOR - Documentação do Módulo
+ * Módulo de simulação de sensor analógico
+ * Simula a entrega de tensão para um pino analógico,
+ * retornando valores normalizados entre 0 e 1024.
  */
 
+/* ANCHOR - Inclusões */
 #include "wokwi-api.h"
 #include <stdio.h>
 #include <stdlib.h>
 
-/* ANCHOR - Constantes e Configurações */
-#define PIN_NAME "A0"  // Pino analógico padrão
-#define MIN_VALUE 0    // Valor mínimo de leitura
-#define MAX_VALUE 1024 // Valor máximo de leitura
-
-/* SECTION - Declarações Externas */
-extern int32_t analog_read_pin(pin_t pin);
-
-/* ANCHOR - Estrutura de Estado */
+/* ANCHOR - Definições de Tipos */
 typedef struct
 {
-    pin_t sensor_pin; // Pino do sensor configurado
+    pin_t pin_out;
+    uint32_t moisture_attr;
 } chip_state_t;
 
-static chip_state_t *chip;
+/* ANCHOR - Protótipos */
+static void chip_timer_event(void *user_data);
 
-/* ANCHOR - Funções Principais */
-int32_t tick()
+/* ANCHOR - Implementação: Inicialização
+ * Inicializa o módulo do sensor.
+ * - Configura estrutura de estado
+ * - Inicializa pino de saída analógica
+ * - Configura atributo de umidade
+ * - Estabelece timer para atualizações periódicas
+ */
+void chip_init(void)
 {
-    /* SECTION - Leitura e Normalização
-     * Realiza a leitura do sensor e garante que o valor
-     * esteja dentro dos limites estabelecidos
-     */
-    int32_t value = analog_read_pin(chip->sensor_pin);
+    chip_state_t *chip = malloc(sizeof(chip_state_t));
+    chip->pin_out = pin_init("OUT", ANALOG);
+    chip->moisture_attr = attr_init_float("moisture", 1.0);
 
-    // Normalização dos valores
-    if (value < MIN_VALUE)
-        value = MIN_VALUE;
-    if (value > MAX_VALUE)
-        value = MAX_VALUE;
-
-    return value;
+    const timer_config_t timer_config = {
+        .callback = chip_timer_event,
+        .user_data = chip,
+    };
+    timer_t timer_id = timer_init(&timer_config);
+    timer_start(timer_id, 1000, true);
 }
 
-void chip_init()
+/* ANCHOR - Implementação: Timer
+ * Função de callback do timer
+ * Atualiza o valor do pino analógico com base no atributo de umidade
+ *
+ * @param user_data Ponteiro para estrutura de estado do chip
+ */
+void chip_timer_event(void *user_data)
 {
-    /* SECTION - Inicialização
-     * Aloca memória e configura o pino do sensor
-     */
-    chip = malloc(sizeof(chip_state_t));
-    chip->sensor_pin = pin_init(PIN_NAME, ANALOG);
-
-    printf("Sensor chip initialized!\n");
+    chip_state_t *chip = (chip_state_t *)user_data;
+    float moisture = attr_read_float(chip->moisture_attr);
+    pin_dac_write(chip->pin_out, moisture);
 }
 
-/* TODO - Implementar função de cleanup para liberar memória alocada
- * TODO - Adicionar suporte para múltiplos pinos analógicos
- * TODO - Implementar filtro de média móvel para reduzir ruído (talvez! Um TALVEZ bem grande, caso um dia eu revisite esse projeto...)
+/* TODO
+ * - Implementar liberação de memória
+ * - Adicionar suporte multi-pino
+ * - Implementar filtro de média móvel
  */
